@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
@@ -9,7 +9,6 @@ import {
   Typography,
   CardMedia,
   Card,
-  CardActionArea,
   CardContent,
   TextField,
   Button,
@@ -27,39 +26,33 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Login = () => {
   const [playerName, setPlayerName] = useState('');
-  const [nameError, setNameError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  let history = useHistory();
-  let player = null;
-  let players = [];
+  const history = useHistory();
 
   const handleChange = (e) => {
     e.preventDefault();
     setPlayerName(e.target.value);
   };
 
-  const getPlayer = (playerName, players) => {
-    player = players.find((playerItem) => playerItem.name === playerName);
-    return player;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    setNameError(false);
     setErrorMessage('');
     if (playerName === '') {
-      setNameError(true);
       setErrorMessage('You must enter player name to start playing the game');
     } else {
-      players = JSON.parse(localStorage.getItem('players') || '[]');
-      if (getPlayer(playerName, players)) {
-        history.push({ pathname: '/home', state: player });
+      const players = JSON.parse(localStorage.getItem('players') || '[]');
+      const existingPlayer = players.find(
+        (player) => player.name === playerName
+      );
+      if (existingPlayer) {
+        localStorage.setItem('currentPlayer', JSON.stringify(existingPlayer));
       } else {
         const newPlayer = { name: playerName, level: 0, score: 0 };
+        localStorage.setItem('currentPlayer', JSON.stringify(newPlayer));
         players.push(newPlayer);
         localStorage.setItem('players', JSON.stringify(players));
-        history.push({ pathname: '/home', state: newPlayer });
       }
+      history.push('/home');
     }
   };
 
@@ -78,35 +71,44 @@ const Login = () => {
             <Item>
               <Card>
                 <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-                  <CardActionArea>
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={reptile}
-                      alt="green iguana"
-                    />
-                    <CardContent>
-                      <Typography gutterBottom variant="h6" component="div">
-                        Enter player name
-                      </Typography>
-                      <Box
-                        sx={{
-                          width: 500,
-                          maxWidth: '100%',
-                        }}
-                      >
-                        <TextField
-                          fullWidth
-                          label={`${nameError ? 'Input error' : 'Player name'}`}
-                          id="fullWidth"
-                          onChange={handleChange}
-                          variant="outlined"
-                          color="primary"
-                          error={nameError}
-                        />
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={reptile}
+                    alt="green iguana"
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h6" component="div">
+                      Enter player name
+                    </Typography>
+                    <Box
+                      sx={{
+                        width: 500,
+                        maxWidth: '100%',
+                      }}
+                    >
+                      {errorMessage && (
+                        <Box
+                          sx={{
+                            paddingTop: 2,
+                            paddingBottom: 2,
+                            bgcolor: 'background.paper',
+                          }}
+                        >
+                          <Alert severity="error">{errorMessage}</Alert>
+                        </Box>
+                      )}
+                      <TextField
+                        fullWidth
+                        label="Player name"
+                        id="fullWidth"
+                        onChange={handleChange}
+                        variant="outlined"
+                        color="primary"
+                        error={errorMessage}
+                      />
+                    </Box>
+                  </CardContent>
                   <CardActions style={{ justifyContent: 'center' }}>
                     <Button variant="contained" color="primary" type="submit">
                       start playing
@@ -116,13 +118,6 @@ const Login = () => {
               </Card>
             </Item>
           </Grid>
-          {nameError && (
-            <Grid item xs={12}>
-              <Item>
-                <Alert severity="error">{errorMessage}</Alert>
-              </Item>
-            </Grid>
-          )}
         </Grid>
       </Box>
     </Container>
