@@ -1,5 +1,5 @@
 import reptile from './contemplative-reptile.jpg';
-
+// izbaciti slike
 const imagesList = [
   {
     type: 'Pikachu',

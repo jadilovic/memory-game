@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -6,17 +6,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-export default function Heading(props) {
-  const { name, level, score } = props;
-  const [counter, setCounter] = useState(60);
+export default function Heading(playerProps) {
+  const { name, level } = playerProps;
   const gameStarted = localStorage.getItem('gameStarted');
   const history = useHistory();
-
-  useEffect(() => {
-    const timer =
-      counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
-    return () => clearInterval(timer);
-  }, [counter]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -28,13 +21,7 @@ export default function Heading(props) {
           {gameStarted && (
             <>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                {`Level: ${level}`}
-              </Typography>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                {`Score: ${score}`}
-              </Typography>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                {`Timer: ${counter}`}
+                {`Level: ${level + 1}`}
               </Typography>
             </>
           )}

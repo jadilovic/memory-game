@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import useLocalStorageHook from '../utils/useLocalStorageHook';
 import { styled } from '@mui/material/styles';
 import {
   Box,
@@ -28,10 +29,27 @@ const Login = () => {
   const [playerName, setPlayerName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const history = useHistory();
+  const data = useLocalStorageHook();
 
   const handleChange = (e) => {
     e.preventDefault();
     setPlayerName(e.target.value);
+  };
+
+  const checkIfPlayerExists = (enteredPlayerName) => {
+    const playersArray = data.getAllPlayers();
+    return playersArray.find((player) => player.name === enteredPlayerName);
+  };
+
+  const savePlayerObject = (enteredPlayerName) => {
+    const existingPlayer = checkIfPlayerExists(enteredPlayerName);
+    if (existingPlayer) {
+      data.saveCurrentPlayerObject(existingPlayer);
+    } else {
+      const newPlayer = { name: enteredPlayerName, level: 0, score: 0 };
+      data.saveCurrentPlayerObject(newPlayer);
+      data.addNewPlayerObjectToArrayAndSave(newPlayer);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -40,18 +58,7 @@ const Login = () => {
     if (playerName === '') {
       setErrorMessage('You must enter player name to start playing the game');
     } else {
-      const players = JSON.parse(localStorage.getItem('players') || '[]');
-      const existingPlayer = players.find(
-        (player) => player.name === playerName
-      );
-      if (existingPlayer) {
-        localStorage.setItem('currentPlayer', JSON.stringify(existingPlayer));
-      } else {
-        const newPlayer = { name: playerName, level: 0, score: 0 };
-        localStorage.setItem('currentPlayer', JSON.stringify(newPlayer));
-        players.push(newPlayer);
-        localStorage.setItem('players', JSON.stringify(players));
-      }
+      savePlayerObject(playerName);
       history.push('/home');
     }
   };

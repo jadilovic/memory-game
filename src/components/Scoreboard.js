@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
+import useLocalStorageHook from '../utils/useLocalStorageHook';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -28,9 +29,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const rows = JSON.parse(localStorage.getItem('players') || '[]');
-
 export default function Scoreboard() {
+  const data = useLocalStorageHook();
+  const [players, setPlayers] = useState([]);
+
+  useEffect(() => {
+    setPlayers(data.getAllPlayers);
+  }, []);
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="customized table">
@@ -43,7 +49,7 @@ export default function Scoreboard() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
+          {players.map((row, index) => (
             <StyledTableRow key={row.name}>
               <StyledTableCell>{index + 1}</StyledTableCell>
               <StyledTableCell>{row.name}</StyledTableCell>
