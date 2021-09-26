@@ -57,9 +57,8 @@ export default function Game() {
     setGridArray(shuffleImages(util.createArray(sizeOfGrid.current)));
   }, []);
 
-  const addPoints = (e) => {
-    e.preventDefault();
-    setScoreCount(scoreCount + 1);
+  const addPoints = () => {
+    setScoreCount(scoreCount + 2);
   };
 
   const levelCompleted = (array) => {
@@ -71,13 +70,14 @@ export default function Game() {
     if (firstCard.current.id === secondCard.current.id) {
       gridArray[firstCard.current.index].isInactive = true;
       gridArray[secondCard.current.index].isInactive = true;
+      addPoints();
     } else {
       gridArray[firstCard.current.index].isFlipped = false;
       gridArray[secondCard.current.index].isFlipped = false;
     }
 
     if (levelCompleted(gridArray)) {
-      // data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
+      data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
       level.current++;
       sizeOfGrid.current = (level.current + 2) * (level.current + 2);
       setGridArray(shuffleImages(util.createArray(sizeOfGrid.current)));
@@ -135,7 +135,7 @@ export default function Game() {
   console.log(sizeOfGrid.current);
   return (
     <Container maxWidth="md">
-      <Heading name={currentPlayer.name} level={currentPlayer.level} />
+      <Heading name={currentPlayer.name} level={level.current} />
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
