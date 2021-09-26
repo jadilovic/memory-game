@@ -2,7 +2,7 @@ import React from 'react';
 import questionMark from '../images/questionM.png';
 import contemplativeReptile from '../images/contemplative-reptile.jpg';
 import imagesList from '../images/imagesList';
-import guessing from '../images/guessing.png';
+import guessing from '../images/guessed.png';
 
 const Card = ({
   onClick,

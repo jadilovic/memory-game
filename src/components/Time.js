@@ -7,7 +7,6 @@ export default function Time() {
   const [timeCounter, setTimeCounter] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState(data.getCurrentPlayer());
 
-  console.log('time');
   const calculateLevelTimeLimit = (player) => {
     return (((currentPlayer.level + 1) * (currentPlayer.level + 1)) / 2) * 60;
   };

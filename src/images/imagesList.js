@@ -1,29 +1,78 @@
 import reptile from './contemplative-reptile.jpg';
-// izbaciti slike
+import dog from './dog.png';
+import bear from './bear.png';
+import birds from './birds.png';
+import cow from './cow.png';
+import dyno from './dyno.png';
+import eagle from './eagle.png';
+import flamingo from './flamingo.png';
+import horse from './horse.png';
+import monkey from './monkey.png';
+import tiger from './tiger.png';
+import tuna from './tuna.png';
+import wolf from './wolf.png';
+import cat from './cat.png';
+
 const imagesList = [
   {
-    type: 'Pikachu',
+    type: 'reptile',
     image: reptile,
   },
   {
-    type: 'ButterFree',
-    image: reptile,
+    type: 'dog',
+    image: dog,
   },
   {
-    type: 'Charmander',
-    image: reptile,
+    type: 'bear',
+    image: bear,
   },
   {
-    type: 'Squirtle',
-    image: reptile,
+    type: 'wolf',
+    image: wolf,
   },
   {
-    type: 'Pidgetto',
-    image: reptile,
+    type: 'monkey',
+    image: monkey,
   },
   {
-    type: 'Bulbasaur',
-    image: reptile,
+    type: 'birds',
+    image: birds,
+  },
+  {
+    type: 'horse',
+    image: horse,
+  },
+  {
+    type: 'cat',
+    image: cat,
+  },
+  {
+    type: 'cow',
+    image: cow,
+  },
+  {
+    type: 'dyno',
+    image: dyno,
+  },
+  {
+    type: 'eagle',
+    image: eagle,
+  },
+  {
+    type: 'flamingo',
+    image: flamingo,
+  },
+  {
+    type: 'tiger',
+    image: tiger,
+  },
+  {
+    type: 'tuna',
+    image: tuna,
+  },
+  {
+    type: 'eagle',
+    image: eagle,
   },
 ];
 
