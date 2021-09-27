@@ -53,6 +53,7 @@ export default function Game() {
     const currentPlayer = data.getCurrentPlayer();
     setCurrentPlayer(currentPlayer);
     level.current = currentPlayer.level;
+    // size of array number of card
     sizeOfGrid.current = (level.current + 2) * (level.current + 2);
     setGridArray(shuffleImages(util.createArray(sizeOfGrid.current)));
   }, []);
@@ -67,6 +68,7 @@ export default function Game() {
   };
 
   const checkClickedCards = () => {
+    // add new functions
     if (firstCard.current.id === secondCard.current.id) {
       gridArray[firstCard.current.index].isInactive = true;
       gridArray[secondCard.current.index].isInactive = true;
@@ -102,19 +104,13 @@ export default function Game() {
     }
   }, [startTimer]);
 
-  const checkIsInactive = (index) => {
-    return 'check is inactive';
-  };
-
-  const checkIsFlipped = (index) => {
-    return 'check is flipped';
-  };
-
   const handleClicks = (index) => {
+    // funkcije
     if (previousIndex.current !== index && index !== -2 && !disableClicks) {
       previousIndex.current = index;
       gridArray[index].isFlipped = true;
       setGridArray(gridArray);
+      // if needed set click
       setClicks(clicks + 1);
       countClicks.current++;
       if (countClicks.current === 1) {
@@ -124,15 +120,21 @@ export default function Game() {
         secondCard.current.index = index;
         secondCard.current.id = gridArray[index].id;
       }
+      // if found go to next no waiting time
+      // able to go to next pair right away
       if (countClicks.current > 1) {
         countClicks.current = 0;
+        previousIndex.current = -1;
         setDisableClicks(true);
         setStartTimer(startTimer + 1);
       }
     }
   };
-  console.log(gridArray);
-  console.log(sizeOfGrid.current);
+
+  // empty field
+  // modal ubaciti
+  // restart only on current level
+  // not going back to zero
   return (
     <Container maxWidth="md">
       <Heading name={currentPlayer.name} level={level.current} />
@@ -180,7 +182,7 @@ export default function Game() {
           </Grid>
           <Grid item xs={4}>
             <Item>
-              <Time />
+              <Time level={level.current} />
             </Item>
           </Grid>
         </Grid>

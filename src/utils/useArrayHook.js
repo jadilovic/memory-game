@@ -6,6 +6,7 @@ const useArrayHook = () => {
     console.log('use ARRAY Hook', numberOfItems);
     let index = 0;
     const dynamicArray = [];
+
     for (let i = 0; i < numberOfItems / 2; i++) {
       if (index > imagesList.length - 1) {
         index = 0;

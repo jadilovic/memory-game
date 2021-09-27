@@ -1,28 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import useLocalStorageHook from '../utils/useLocalStorageHook';
+import React, { useEffect, useState, useRef } from 'react';
 import Typography from '@mui/material/Typography';
 
-export default function Time() {
-  const data = useLocalStorageHook();
+export default function Time(props) {
+  const { level } = props;
   const [timeCounter, setTimeCounter] = useState(0);
-  const [currentPlayer, setCurrentPlayer] = useState(data.getCurrentPlayer());
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const previousLevel = useRef(0);
+  const levelTimeLimit = useRef(0);
+  let timer = null;
 
-  const calculateLevelTimeLimit = (player) => {
-    return (((currentPlayer.level + 1) * (currentPlayer.level + 1)) / 2) * 60;
+  const calculateLevelTimeLimit = (level) => {
+    return (((level + 1) * (level + 1)) / 2) * 60;
   };
 
+  if (previousLevel.current !== level) {
+    clearInterval(timer);
+    levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
+    previousLevel.current = level;
+    setTimeCounter(levelTimeLimit.current);
+    setCurrentLevel(level);
+  }
+
   useEffect(() => {
-    let levelTimeLimit = calculateLevelTimeLimit(currentPlayer);
-    const timer =
-      levelTimeLimit >= 0 &&
+    levelTimeLimit.current = calculateLevelTimeLimit(currentLevel + 1);
+    previousLevel.current = level;
+    setTimeCounter(levelTimeLimit.current);
+  }, []);
+
+  useEffect(() => {
+    timer =
+      levelTimeLimit.current >= 0 &&
       setInterval(() => {
-        setTimeCounter(levelTimeLimit--);
-        if (levelTimeLimit < 1) {
+        setTimeCounter(levelTimeLimit.current--);
+        if (levelTimeLimit.current < 1) {
           clearInterval(timer);
         }
       }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [currentLevel]);
 
   return (
     <React.Fragment>
