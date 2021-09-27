@@ -2,10 +2,8 @@ import { useEffect, useState, useRef, memo } from 'react';
 import useLocalStorageHook from '../utils/useLocalStorageHook';
 import useArrayHook from '../utils/useArrayHook';
 import { styled } from '@mui/material/styles';
-import imagesList from '../images/imagesList';
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
 import { Container, Box, Grid, Paper, Button, Typography } from '@mui/material';
+import ImgCard from '../components/ImgCard';
 import Heading from '../components/Heading';
 import Time from '../components/Time';
 import Score from '../components/Score';
@@ -42,7 +40,7 @@ export default function Game() {
   const [disableClicks, setDisableClicks] = useState(false);
 
   const level = useRef(0);
-  const sizeOfGrid = useRef(0);
+  const numberOfCards = useRef(0);
   const countClicks = useRef(0);
   const isInitialMount = useRef(true);
   const firstCard = useRef({ index: null, id: null });
@@ -52,10 +50,9 @@ export default function Game() {
   useEffect(() => {
     const currentPlayer = data.getCurrentPlayer();
     setCurrentPlayer(currentPlayer);
-    level.current = currentPlayer.level;
-    // size of array number of card
-    sizeOfGrid.current = (level.current + 2) * (level.current + 2);
-    setGridArray(shuffleImages(util.createArray(sizeOfGrid.current)));
+    level.current = currentPlayer.level + 1;
+    numberOfCards.current = level.current * 2 * (level.current * 2);
+    setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
   }, []);
 
   const addPoints = () => {
@@ -81,8 +78,8 @@ export default function Game() {
     if (levelCompleted(gridArray)) {
       data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
       level.current++;
-      sizeOfGrid.current = (level.current + 2) * (level.current + 2);
-      setGridArray(shuffleImages(util.createArray(sizeOfGrid.current)));
+      numberOfCards.current = (level.current + 2) * (level.current + 2);
+      setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
     } else {
       setGridArray(gridArray);
     }
@@ -137,30 +134,28 @@ export default function Game() {
   // not going back to zero
   return (
     <Container maxWidth="md">
-      <Heading name={currentPlayer.name} level={level.current} />
-      <Box sx={{ flexGrow: 1 }}>
+      <Heading name={currentPlayer.name} level={level.current - 1} />
+      <Box sx={{ flexGrow: 1 }} paddingTop={1}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Item>
-              <ImageList cols={level.current + 2} rowHeight="auto">
-                {gridArray.map((item, index) => (
-                  <ImageListItem key={index}>
-                    <img
-                      onClick={() => handleClicks(item.isInactive ? -2 : index)}
-                      src={
-                        item.isFlipped
-                          ? item.isInactive
-                            ? guessed
-                            : imagesList[item.imageIndex].image
-                          : questionMark
-                      }
-                      alt={item.type}
-                      loading="lazy"
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid
+                container
+                spacing={1}
+                columns={level.current * 2 * (level.current * 2)}
+              >
+                {gridArray.map((card, index) => (
+                  <Grid item xs={level.current * 2} key={index}>
+                    <ImgCard
+                      key={index}
+                      card={card}
+                      index={index}
+                      onClick={handleClicks}
                     />
-                  </ImageListItem>
+                  </Grid>
                 ))}
-              </ImageList>
-            </Item>
+              </Grid>
+            </Box>
           </Grid>
           <Grid item xs={4}>
             <Item>
@@ -182,7 +177,7 @@ export default function Game() {
           </Grid>
           <Grid item xs={4}>
             <Item>
-              <Time level={level.current} />
+              <Time level={level.current - 1} />
             </Item>
           </Grid>
         </Grid>
