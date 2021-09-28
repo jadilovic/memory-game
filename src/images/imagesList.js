@@ -11,8 +11,13 @@ import tiger from './tiger.png';
 import tuna from './tuna.png';
 import wolf from './wolf.png';
 import cat from './cat.png';
+import joker from './joker.png';
 
 const imagesList = [
+  {
+    type: 'joker',
+    image: joker,
+  },
   {
     type: 'dog',
     image: dog,

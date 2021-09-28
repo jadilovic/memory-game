@@ -145,6 +145,11 @@ export default function Game() {
       startTimerIfTwoCardsAdded();
     }
   };
+
+  const restartCurrentLevel = () => {
+    numberOfCards.current = level.current * 2 * (level.current * 2);
+    setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+  };
   // modal ubaciti
   // restart only on current level
   // not going back to zero
@@ -187,7 +192,7 @@ export default function Game() {
                 color="warning"
                 variant="contained"
                 // interni restart logika
-                onClick={() => document.location.reload(true)}
+                onClick={() => restartCurrentLevel()}
               >
                 <Typography>restart</Typography>
               </Button>
