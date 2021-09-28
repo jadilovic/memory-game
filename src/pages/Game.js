@@ -7,8 +7,6 @@ import ImgCard from '../components/ImgCard';
 import Heading from '../components/Heading';
 import Time from '../components/Time';
 import Score from '../components/Score';
-import guessed from '../images/guessed.png';
-import questionMark from '../images/questionM.png';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -37,15 +35,13 @@ export default function Game() {
   const [currentPlayer, setCurrentPlayer] = useState({});
   const [gridArray, setGridArray] = useState([]);
   const [startTimer, setStartTimer] = useState(0);
-  const [disableClicks, setDisableClicks] = useState(false);
 
   const level = useRef(0);
   const numberOfCards = useRef(0);
-  const countClicks = useRef(0);
   const isInitialMount = useRef(true);
-  const firstCard = useRef({ index: null, id: null });
-  const secondCard = useRef({ index: null, id: null });
   const previousIndex = useRef(-1);
+  const twoCardsArray = useRef([]);
+  let timer = null;
 
   useEffect(() => {
     const currentPlayer = data.getCurrentPlayer();
@@ -64,34 +60,42 @@ export default function Game() {
     return allIsInactive;
   };
 
+  const saveToLocalStorageAndStartNextLevel = () => {
+    data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
+    level.current++;
+    numberOfCards.current = level.current * 2 * (level.current * 2);
+    setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+  };
+
+  const emptyTwoCardsArrayAndRerender = () => {
+    twoCardsArray.current.pop();
+    twoCardsArray.current.pop();
+    setClicks(clicks + 1);
+  };
+
   const checkClickedCards = () => {
-    // add new functions
-    if (firstCard.current.id === secondCard.current.id) {
-      gridArray[firstCard.current.index].isInactive = true;
-      gridArray[secondCard.current.index].isInactive = true;
+    if (twoCardsArray.current[0].id === twoCardsArray.current[1].id) {
+      gridArray[twoCardsArray.current[0].cardIndex].isInactive = true;
+      gridArray[twoCardsArray.current[1].cardIndex].isInactive = true;
       addPoints();
     } else {
-      gridArray[firstCard.current.index].isFlipped = false;
-      gridArray[secondCard.current.index].isFlipped = false;
+      gridArray[twoCardsArray.current[0].cardIndex].isFlipped = false;
+      gridArray[twoCardsArray.current[1].cardIndex].isFlipped = false;
     }
 
     if (levelCompleted(gridArray)) {
-      data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
-      level.current++;
-      numberOfCards.current = (level.current + 2) * (level.current + 2);
-      setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+      saveToLocalStorageAndStartNextLevel();
     } else {
       setGridArray(gridArray);
     }
-    setDisableClicks(false);
-    setClicks(clicks + 1);
+    emptyTwoCardsArrayAndRerender();
   };
 
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         console.log('This will run after 1 second! countClicks: ' + clicks);
         checkClickedCards();
       }, 1000);
@@ -101,37 +105,50 @@ export default function Game() {
     }
   }, [startTimer]);
 
-  const handleClicks = (index) => {
-    // funkcije
-    if (previousIndex.current !== index && index !== -2 && !disableClicks) {
-      previousIndex.current = index;
-      gridArray[index].isFlipped = true;
-      setGridArray(gridArray);
-      // if needed set click
-      setClicks(clicks + 1);
-      countClicks.current++;
-      if (countClicks.current === 1) {
-        firstCard.current.index = index;
-        firstCard.current.id = gridArray[index].id;
-      } else {
-        secondCard.current.index = index;
-        secondCard.current.id = gridArray[index].id;
-      }
-      // if found go to next no waiting time
-      // able to go to next pair right away
-      if (countClicks.current > 1) {
-        countClicks.current = 0;
-        previousIndex.current = -1;
-        setDisableClicks(true);
-        setStartTimer(startTimer + 1);
-      }
+  const isNotPreviousOrInactive = (index) => {
+    return !gridArray[index].isInactive
+      ? previousIndex.current !== index
+      : false;
+  };
+
+  const updateCardAndGridArray = (index) => {
+    gridArray[index].isFlipped = true;
+    setGridArray(gridArray);
+    // clicks d to rerender
+    setClicks(clicks + 1);
+  };
+
+  const checkTwoCardsArraySize = () => {
+    if (twoCardsArray.current.length > 1) {
+      clearTimeout(timer);
+      checkClickedCards();
     }
   };
 
-  // empty field
+  const addCardValuesToTwoCardsArray = (index) => {
+    const clickedCard = { cardIndex: index, id: gridArray[index].id };
+    twoCardsArray.current.push(clickedCard);
+  };
+
+  const startTimerIfTwoCardsAdded = () => {
+    if (twoCardsArray.current.length > 1) {
+      setStartTimer(startTimer + 1);
+    }
+  };
+
+  const handleClicks = (index) => {
+    if (isNotPreviousOrInactive(index)) {
+      previousIndex.current = index;
+      checkTwoCardsArraySize();
+      updateCardAndGridArray(index);
+      addCardValuesToTwoCardsArray(index);
+      startTimerIfTwoCardsAdded();
+    }
+  };
   // modal ubaciti
   // restart only on current level
   // not going back to zero
+
   return (
     <Container maxWidth="md">
       <Heading name={currentPlayer.name} level={level.current - 1} />
@@ -169,6 +186,7 @@ export default function Game() {
                 fullWidth
                 color="warning"
                 variant="contained"
+                // interni restart logika
                 onClick={() => document.location.reload(true)}
               >
                 <Typography>restart</Typography>

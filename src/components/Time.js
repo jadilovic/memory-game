@@ -13,6 +13,9 @@ export default function Time(props) {
     return (((level + 1) * (level + 1)) / 2) * 60;
   };
 
+  // use effect level
+  // lifting state up
+  /*
   if (previousLevel.current !== level) {
     clearInterval(timer);
     levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
@@ -20,6 +23,16 @@ export default function Time(props) {
     setTimeCounter(levelTimeLimit.current);
     setCurrentLevel(level);
   }
+*/
+  useEffect(() => {
+    if (previousLevel.current !== level) {
+      clearInterval(timer);
+      levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
+      previousLevel.current = level;
+      setTimeCounter(levelTimeLimit.current);
+      setCurrentLevel(level);
+    }
+  }, [level]);
 
   useEffect(() => {
     levelTimeLimit.current = calculateLevelTimeLimit(currentLevel + 1);

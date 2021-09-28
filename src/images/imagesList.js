@@ -1,4 +1,3 @@
-import reptile from './contemplative-reptile.jpg';
 import dog from './dog.png';
 import bear from './bear.png';
 import birds from './birds.png';
@@ -14,10 +13,6 @@ import wolf from './wolf.png';
 import cat from './cat.png';
 
 const imagesList = [
-  {
-    type: 'reptile',
-    image: reptile,
-  },
   {
     type: 'dog',
     image: dog,
@@ -69,10 +64,6 @@ const imagesList = [
   {
     type: 'tuna',
     image: tuna,
-  },
-  {
-    type: 'eagle',
-    image: eagle,
   },
 ];
 
