@@ -11,7 +11,7 @@ export default function Score(props) {
         bgcolor="gray"
         gutterBottom
       >
-        Level:
+        Completed Level:
       </Typography>
       <Typography component="p" variant="h6">
         {props.level}

@@ -7,8 +7,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
 export default function Heading(playerProps) {
-  const { name, level } = playerProps;
-  const gameStarted = localStorage.getItem('gameStarted');
+  const { name, level, gameStarted } = playerProps;
   const history = useHistory();
 
   return (

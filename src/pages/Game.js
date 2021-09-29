@@ -15,42 +15,49 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function shuffleImages(array) {
-  const length = array.length;
-  for (let i = length; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * i);
-    const currentIndex = i - 1;
-    const temp = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temp;
-  }
-  return array;
-}
-
 export default function Game() {
   const data = useLocalStorageHook();
   const util = useArrayHook();
   const [scoreCount, setScoreCount] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
   const [clicks, setClicks] = useState(0);
-  const [currentPlayer, setCurrentPlayer] = useState({});
   const [gridArray, setGridArray] = useState([]);
   const [startTimer, setStartTimer] = useState(0);
+  const [restartTimeLimit, setRestartTimeLimit] = useState(0);
 
+  const player = useRef({});
   const level = useRef(0);
   const numberOfCards = useRef(0);
   const isInitialMount = useRef(true);
   const previousIndex = useRef(-1);
   const twoCardsArray = useRef([]);
+  const gameStarted = localStorage.getItem('gameStarted');
   let timer = null;
 
+  function shuffleImages(array) {
+    const length = array.length;
+    for (let i = length; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * i);
+      const currentIndex = i - 1;
+      const temp = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temp;
+    }
+    return array;
+  }
+
   useEffect(() => {
-    const currentPlayer = data.getCurrentPlayer();
-    setCurrentPlayer(currentPlayer);
-    level.current = currentPlayer.level + 1;
+    player.current = data.getCurrentPlayer();
+    level.current = player.current.level + 1;
+    if (gameStarted === 'CONTINUE') {
+      level.current + 1;
+      setScoreCount(data.getCurrentPlayer().score);
+    }
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
   }, []);
 
+  // get time left and save in local storage
   const addPoints = () => {
     setScoreCount(scoreCount + 2);
   };
@@ -61,10 +68,15 @@ export default function Game() {
   };
 
   const saveToLocalStorageAndStartNextLevel = () => {
-    data.increaseCurrentPlayerLevelAndUpdateDatabase(currentPlayer);
+    const calculatedScore = totalScore + 10;
+    data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
+      calculatedScore
+    );
+    setScoreCount(calculatedScore);
     level.current++;
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+    // vrijeme ostalo za score
   };
 
   const emptyTwoCardsArrayAndRerender = () => {
@@ -84,12 +96,20 @@ export default function Game() {
     }
 
     if (levelCompleted(gridArray)) {
-      saveToLocalStorageAndStartNextLevel();
+      setTotalScore(scoreCount + 2);
     } else {
       setGridArray(gridArray);
     }
     emptyTwoCardsArrayAndRerender();
   };
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = true;
+    } else {
+      saveToLocalStorageAndStartNextLevel();
+    }
+  }, [totalScore]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -147,16 +167,22 @@ export default function Game() {
   };
 
   const restartCurrentLevel = () => {
+    setRestartTimeLimit(restartTimeLimit + 1);
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+    setScoreCount(data.getCurrentPlayer().score);
   };
+
   // modal ubaciti
   // restart only on current level
   // not going back to zero
-
   return (
     <Container maxWidth="md">
-      <Heading name={currentPlayer.name} level={level.current - 1} />
+      <Heading
+        name={player.current.name}
+        level={level.current - 1}
+        gameStarted={gameStarted}
+      />
       <Box sx={{ flexGrow: 1 }} paddingTop={1}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -200,7 +226,7 @@ export default function Game() {
           </Grid>
           <Grid item xs={4}>
             <Item>
-              <Time level={level.current - 1} />
+              <Time level={level.current - 1} restart={restartTimeLimit} />
             </Item>
           </Grid>
         </Grid>

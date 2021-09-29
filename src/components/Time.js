@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Typography from '@mui/material/Typography';
 
 export default function Time(props) {
-  const { level } = props;
+  const { level, restart } = props;
   const [timeCounter, setTimeCounter] = useState(0);
   const [currentLevel, setCurrentLevel] = useState(0);
   const previousLevel = useRef(0);
@@ -13,26 +13,24 @@ export default function Time(props) {
     return (((level + 1) * (level + 1)) / 2) * 60;
   };
 
-  // use effect level
   // lifting state up
-  /*
-  if (previousLevel.current !== level) {
+  const settingUpNewInterval = () => {
     clearInterval(timer);
     levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
     previousLevel.current = level;
     setTimeCounter(levelTimeLimit.current);
     setCurrentLevel(level);
-  }
-*/
+  };
+
   useEffect(() => {
     if (previousLevel.current !== level) {
-      clearInterval(timer);
-      levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
-      previousLevel.current = level;
-      setTimeCounter(levelTimeLimit.current);
-      setCurrentLevel(level);
+      settingUpNewInterval();
     }
   }, [level]);
+
+  useEffect(() => {
+    settingUpNewInterval();
+  }, [restart]);
 
   useEffect(() => {
     levelTimeLimit.current = calculateLevelTimeLimit(currentLevel + 1);

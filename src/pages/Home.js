@@ -29,14 +29,14 @@ const Home = () => {
     e.preventDefault();
     // NEW ITEM IN LOCAL STORAGE TO CONTROL START OF THE GAME
     data.restartCurrentPlayerLevelAndScoreAndUpdateDatabase(currentPlayer);
-    localStorage.setItem('gameStarted', 'YES');
+    localStorage.setItem('gameStarted', 'NEW_GAME');
     history.push('/game');
   };
 
   const continueGame = (e) => {
     e.preventDefault();
     // NEW ITEM IN LOCAL STORAGE TO CONTROL START OF THE GAME
-    localStorage.setItem('gameStarted', 'YES');
+    localStorage.setItem('gameStarted', 'CONTINUE');
     history.push('/game');
   };
 
@@ -81,7 +81,7 @@ const Home = () => {
                 <Typography>continue</Typography>
               </Button>
               <Typography component="text">
-                Starts the game at the last finished Level
+                Starts the game at not completed level
               </Typography>
             </Item>
           </Grid>

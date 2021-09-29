@@ -17,7 +17,7 @@ const Footer = () => {
       <Grid paddingTop={4} paddingBottom={6} container spacing={4}>
         <Grid item xs={6}>
           <Item>
-            <Typography>{`Level: ${currentPlayer.level}`}</Typography>
+            <Typography>{`Completed Level: ${currentPlayer.level}`}</Typography>
           </Item>
         </Grid>
         <Grid item xs={6}>

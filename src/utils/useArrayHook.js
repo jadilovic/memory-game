@@ -1,36 +1,35 @@
 import React from 'react';
 import imagesList from '../images/imagesList';
-import joker from '../images/joker.png';
 
 const useArrayHook = () => {
+  const getRandomColor = () => {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const getStartingIndexForImagesList = () => {
+    const randomNumberForJoker = Math.random();
+    if (randomNumberForJoker < 0.2) {
+      return 0;
+    } else {
+      return 1;
+    }
+  };
+
   const createArray = (numberOfItems) => {
     console.log('use ARRAY Hook', numberOfItems);
-    let index = 1;
     const dynamicArray = [];
     let dynamicImage = false;
     let randomColor = '';
-
-    const getRandomColor = () => {
-      var letters = '0123456789ABCDEF';
-      var color = '#';
-      for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    };
-
-    const addJokerFor20Percent = () => {
-      const randomNumber = Math.random();
-      if (randomNumber < 0.2) {
-        index = 0;
-      }
-    };
-
-    addJokerFor20Percent();
+    let index = getStartingIndexForImagesList();
 
     for (let i = 0; i < numberOfItems / 2; i++) {
       if (index > imagesList.length - 1) {
-        index = 0;
+        index = 1;
         dynamicImage = true;
         randomColor = getRandomColor();
       }
