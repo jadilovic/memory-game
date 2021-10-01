@@ -17,7 +17,7 @@ export default function Time(props) {
   let timer = null;
 
   const calculateLevelTimeLimit = (level) => {
-    return (((level + 1) * (level + 1)) / 2) * 10;
+    return (((level + 1) * (level + 1)) / 2) * 6;
   };
 
   useEffect(() => {
@@ -48,10 +48,11 @@ export default function Time(props) {
   }, [restart]);
 
   useEffect(() => {
-    console.log('get time use effect ', level);
+    console.log('2.0 get time use effect ', level);
     if (level !== -1) {
-      console.log('2 current level time limit', levelTimeLimit.current);
+      console.log('2.1 current level time limit', levelTimeLimit.current);
       setCounterTimeLeft(levelTimeLimit.current);
+      levelTimeLimit.current = -2;
     }
   }, [getTimeLeft]);
 
@@ -77,7 +78,7 @@ export default function Time(props) {
   }, [currentLevel, restart]);
 
   useEffect(() => {
-    if (levelTimeLimit.current === 0) {
+    if (levelTimeLimit.current === -1) {
       setTimeExpired(true);
     }
   }, [timeCounter]);
@@ -94,7 +95,7 @@ export default function Time(props) {
         Time left:
       </Typography>
       <Typography component="p" variant="h6">
-        {timeCounter}
+        {timeCounter < 0 ? 0 : timeCounter}
       </Typography>
     </React.Fragment>
   );

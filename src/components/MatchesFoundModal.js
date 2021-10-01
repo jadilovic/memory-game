@@ -9,43 +9,47 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export default function TimeExpiredModal(props) {
+export default function MatchesFoundModal(props) {
   const history = useHistory();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const { openTimeExpiredModal, setOpenTimeExpiredModal, restartCurrentLevel } =
+  const { openMatchesFoundModal, setOpenMatchesFoundModal, startNextLevel } =
     props;
 
   const handleClose = () => {
-    restartCurrentLevel();
-    setOpenTimeExpiredModal(false);
+    startNextLevel();
+    setOpenMatchesFoundModal(false);
   };
 
-  const handleRestart = () => {
-    restartCurrentLevel();
-    setOpenTimeExpiredModal(false);
+  const handleStartNextLevel = () => {
+    startNextLevel();
+    setOpenMatchesFoundModal(false);
   };
 
   return (
     <Dialog
       fullScreen={fullScreen}
-      open={openTimeExpiredModal}
+      open={openMatchesFoundModal}
       onClose={handleClose}
     >
-      <DialogTitle>Level Time Has Expired</DialogTitle>
+      <DialogTitle>You Won! All cards were matched!</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          You can try again at the same level by clicking 'RESTART SAME LEVEL'
-          or go back to the Home page by clicking on the 'BACKT TO HOME PAGE'
-          button.
+          You can go to the next level by clicking 'NEXT LEVEL' or go back to
+          the Home page by clicking on the 'BACKT TO HOME PAGE' button.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" onClick={handleRestart} autoFocus>
-          Restart Same Level
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleStartNextLevel}
+          autoFocus
+        >
+          Next Level
         </Button>
         <Button
-          color="success"
+          color="warning"
           variant="contained"
           onClick={() => history.push('/home')}
         >

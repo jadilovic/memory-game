@@ -3,6 +3,7 @@ import useLocalStorageHook from '../utils/useLocalStorageHook';
 import useArrayHook from '../utils/useArrayHook';
 import useMountedRef from '../utils/useMountedRef';
 import TimeExpiredModal from '../components/TimeExpiredModal';
+import MatchesFoundModal from '../components/MatchesFoundModal';
 import { styled } from '@mui/material/styles';
 import { Container, Box, Grid, Paper, Button, Typography } from '@mui/material';
 import ImgCard from '../components/ImgCard';
@@ -30,6 +31,7 @@ export default function Game() {
   const [jokerTime, setJokerTime] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
   const [openTimeExpiredModal, setOpenTimeExpiredModal] = useState(false);
+  const [openMatchesFoundModal, setOpenMatchesFoundModal] = useState(false);
 
   const player = useRef({});
   const level = useRef(0);
@@ -66,13 +68,17 @@ export default function Game() {
   }, []);
 
   // AFTER LEVEL IS COMPLETED FINAL SCORE IS CALCULATED AND ALL IS SAVED TO LOCAL STORAGE
-  const saveToLocalStorageAndStartNextLevel = () => {
+  const saveToLocalStorageAndShowMatchesFoundModal = () => {
     console.log('4 save method ', counterTimeLeft);
     const calculatedScore = totalScore.current + counterTimeLeft;
     data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
       calculatedScore
     );
-    setScoreCount(calculatedScore);
+    setOpenMatchesFoundModal(true);
+  };
+
+  const startNextLevel = () => {
+    setScoreCount(data.getCurrentPlayer().score);
     level.current++;
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
@@ -146,7 +152,7 @@ export default function Game() {
   useEffect(() => {
     if (mountedRef.current) {
       console.log('3 use effect counter time left');
-      saveToLocalStorageAndStartNextLevel();
+      saveToLocalStorageAndShowMatchesFoundModal();
     }
   }, [counterTimeLeft]);
 
@@ -275,6 +281,11 @@ export default function Game() {
         openTimeExpiredModal={openTimeExpiredModal}
         setOpenTimeExpiredModal={setOpenTimeExpiredModal}
         restartCurrentLevel={restartCurrentLevel}
+      />
+      <MatchesFoundModal
+        openMatchesFoundModal={openMatchesFoundModal}
+        setOpenMatchesFoundModal={setOpenMatchesFoundModal}
+        startNextLevel={startNextLevel}
       />
     </Container>
   );
