@@ -246,7 +246,13 @@ export default function Game() {
           </Grid>
           <Grid item xs={4}>
             <Item>
-              <Score score={scoreCount} />
+              <Score
+                score={
+                  openMatchesFoundModal || openTimeExpiredModal
+                    ? totalScore.current + counterTimeLeft
+                    : scoreCount
+                }
+              />
             </Item>
           </Grid>
           <Grid item xs={4}>
@@ -256,7 +262,6 @@ export default function Game() {
                 fullWidth
                 color="warning"
                 variant="contained"
-                // interni restart logika
                 onClick={() => restartCurrentLevel()}
               >
                 <Typography>restart</Typography>
