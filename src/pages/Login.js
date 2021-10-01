@@ -70,7 +70,7 @@ const Login = () => {
           <Grid item xs={12}>
             <Item>
               <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
-                Welcome to Exciting Memory Game
+                Welcome to Aki's Memory Game
               </Typography>
             </Item>
           </Grid>
