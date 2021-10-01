@@ -7,8 +7,8 @@ export default function Score(props) {
       <Typography
         component="h6"
         variant="h6"
-        color="white"
-        bgcolor="green"
+        color="black"
+        bgcolor="gold"
         gutterBottom
       >
         Score:

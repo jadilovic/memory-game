@@ -28,7 +28,6 @@ const useLocalStorageHook = () => {
       level: currentPlayer.level + 1,
       score: scoreCount,
     };
-    console.log('use local storage', currentPlayer, updateCurrentPlayer);
     localStorage.setItem('currentPlayer', JSON.stringify(updateCurrentPlayer));
     const players = getAllPlayers();
     const currentPlayerIndex = players.findIndex(

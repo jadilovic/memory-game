@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, memo } from 'react';
 import useLocalStorageHook from '../utils/useLocalStorageHook';
 import useArrayHook from '../utils/useArrayHook';
+import useMountedRef from '../utils/useMountedRef';
+import TimeExpiredModal from '../components/TimeExpiredModal';
 import { styled } from '@mui/material/styles';
 import { Container, Box, Grid, Paper, Button, Typography } from '@mui/material';
 import ImgCard from '../components/ImgCard';
@@ -18,19 +20,24 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Game() {
   const data = useLocalStorageHook();
   const util = useArrayHook();
+  const mountedRef = useMountedRef();
   const [scoreCount, setScoreCount] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [gridArray, setGridArray] = useState([]);
   const [startTimer, setStartTimer] = useState(0);
   const [restartTimeLimit, setRestartTimeLimit] = useState(0);
+  const [counterTimeLeft, setCounterTimeLeft] = useState(0);
+  const [jokerTime, setJokerTime] = useState(0);
+  const [timeExpired, setTimeExpired] = useState(false);
+  const [openTimeExpiredModal, setOpenTimeExpiredModal] = useState(false);
 
   const player = useRef({});
   const level = useRef(0);
   const numberOfCards = useRef(0);
-  const isInitialMount = useRef(true);
   const previousIndex = useRef(-1);
   const twoCardsArray = useRef([]);
+  const totalScore = useRef(0);
+  const getTimeLeft = useRef(0);
   const gameStarted = localStorage.getItem('gameStarted');
   let timer = null;
 
@@ -46,6 +53,7 @@ export default function Game() {
     return array;
   }
 
+  // INITIAL USE EFFECT TO CREATE GRID OF CARDS SET SCORE AND TIME AT THE START OF THE GAME
   useEffect(() => {
     player.current = data.getCurrentPlayer();
     level.current = player.current.level + 1;
@@ -57,18 +65,10 @@ export default function Game() {
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
   }, []);
 
-  // get time left and save in local storage
-  const addPoints = () => {
-    setScoreCount(scoreCount + 2);
-  };
-
-  const levelCompleted = (array) => {
-    let allIsInactive = array.every((item) => item.isInactive === true);
-    return allIsInactive;
-  };
-
+  // AFTER LEVEL IS COMPLETED FINAL SCORE IS CALCULATED AND ALL IS SAVED TO LOCAL STORAGE
   const saveToLocalStorageAndStartNextLevel = () => {
-    const calculatedScore = totalScore + 10;
+    console.log('4 save method ', counterTimeLeft);
+    const calculatedScore = totalScore.current + counterTimeLeft;
     data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
       calculatedScore
     );
@@ -76,7 +76,6 @@ export default function Game() {
     level.current++;
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
-    // vrijeme ostalo za score
   };
 
   const emptyTwoCardsArrayAndRerender = () => {
@@ -85,38 +84,57 @@ export default function Game() {
     setClicks(clicks + 1);
   };
 
+  const addPoints = () => {
+    setScoreCount(scoreCount + 2);
+  };
+
+  const checkIfJokerCard = (imageIndexAtTwoCards) => {
+    if (imageIndexAtTwoCards === 0) {
+      setJokerTime(jokerTime + 1);
+    }
+  };
+
+  // CHECKING TWO CLICKED CARDS
   const checkClickedCards = () => {
     if (twoCardsArray.current[0].id === twoCardsArray.current[1].id) {
       gridArray[twoCardsArray.current[0].cardIndex].isInactive = true;
       gridArray[twoCardsArray.current[1].cardIndex].isInactive = true;
+      checkIfJokerCard(
+        gridArray[twoCardsArray.current[0].cardIndex].imageIndex
+      );
       addPoints();
     } else {
       gridArray[twoCardsArray.current[0].cardIndex].isFlipped = false;
       gridArray[twoCardsArray.current[1].cardIndex].isFlipped = false;
     }
-
-    if (levelCompleted(gridArray)) {
-      setTotalScore(scoreCount + 2);
-    } else {
-      setGridArray(gridArray);
-    }
+    setGridArray(gridArray);
     emptyTwoCardsArrayAndRerender();
   };
 
+  // EVERY TIME POINTS ARE ADDED THIS USE EFFECT IS CALLED TO CHECK IF LEVEL IS COMPLETED
+  // AND IF TRUE SCORE IS SAVED TO LOCAL STORAGE AND USER IS TRANSFERED TO THE NEXT LEVEL
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = true;
-    } else {
-      saveToLocalStorageAndStartNextLevel();
+    if (mountedRef.current) {
+      if (levelCompleted(gridArray)) {
+        console.log(
+          '1 if completed, score count use effect, and increase level'
+        );
+        console.log('counter time left', counterTimeLeft);
+        getTimeLeft.current++;
+        totalScore.current = totalScore.current + scoreCount;
+      }
     }
-  }, [totalScore]);
+  }, [scoreCount]);
+
+  // CHECK IF LEVEL IS COMPLETED AFTER TWO EQUAL CARDS ARE FOUND AND SCORE IS INCREASED
+  const levelCompleted = (array) => {
+    let allIsInactive = array.every((item) => item.isInactive === true);
+    return allIsInactive;
+  };
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
+    if (mountedRef.current) {
       timer = setTimeout(() => {
-        console.log('This will run after 1 second! countClicks: ' + clicks);
         checkClickedCards();
       }, 1000);
       return () => {
@@ -124,6 +142,21 @@ export default function Game() {
       };
     }
   }, [startTimer]);
+
+  useEffect(() => {
+    if (mountedRef.current) {
+      console.log('3 use effect counter time left');
+      saveToLocalStorageAndStartNextLevel();
+    }
+  }, [counterTimeLeft]);
+
+  useEffect(() => {
+    if (mountedRef.current) {
+      if (timeExpired) {
+        setOpenTimeExpiredModal(true);
+      }
+    }
+  }, [timeExpired]);
 
   const isNotPreviousOrInactive = (index) => {
     return !gridArray[index].isInactive
@@ -171,11 +204,11 @@ export default function Game() {
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
     setScoreCount(data.getCurrentPlayer().score);
+    setTimeExpired(false);
   };
 
   // modal ubaciti
-  // restart only on current level
-  // not going back to zero
+  console.log(gridArray);
   return (
     <Container maxWidth="md">
       <Heading
@@ -226,11 +259,23 @@ export default function Game() {
           </Grid>
           <Grid item xs={4}>
             <Item>
-              <Time level={level.current - 1} restart={restartTimeLimit} />
+              <Time
+                level={level.current - 1}
+                restart={restartTimeLimit}
+                setCounterTimeLeft={setCounterTimeLeft}
+                jokerTime={jokerTime}
+                getTimeLeft={getTimeLeft.current}
+                setTimeExpired={setTimeExpired}
+              />
             </Item>
           </Grid>
         </Grid>
       </Box>
+      <TimeExpiredModal
+        openTimeExpiredModal={openTimeExpiredModal}
+        setOpenTimeExpiredModal={setOpenTimeExpiredModal}
+        restartCurrentLevel={restartCurrentLevel}
+      />
     </Container>
   );
 }

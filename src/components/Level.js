@@ -8,7 +8,7 @@ export default function Score(props) {
         component="h6"
         variant="h6"
         color="white"
-        bgcolor="gray"
+        bgcolor="royalblue"
         gutterBottom
       >
         Completed Level:

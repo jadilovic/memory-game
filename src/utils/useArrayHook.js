@@ -21,7 +21,6 @@ const useArrayHook = () => {
   };
 
   const createArray = (numberOfItems) => {
-    console.log('use ARRAY Hook', numberOfItems);
     const dynamicArray = [];
     let dynamicImage = false;
     let randomColor = '';
@@ -46,7 +45,12 @@ const useArrayHook = () => {
       }
       index++;
     }
-    console.log(dynamicArray);
+    /*
+    console.log(
+      'joker: ',
+      dynamicArray.find((item) => item.imageIndex === 0)
+    );
+    */
     return dynamicArray;
   };
 
