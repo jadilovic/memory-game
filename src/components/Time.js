@@ -17,7 +17,7 @@ export default function Time(props) {
   let timer = null;
 
   const calculateLevelTimeLimit = (level) => {
-    return (((level + 1) * (level + 1)) / 2) * 6;
+    return (((level + 1) * (level + 1)) / 2) * 60;
   };
 
   useEffect(() => {
