@@ -16,10 +16,18 @@ export default function Time(props) {
   const levelTimeLimit = useRef(0);
   let timer = null;
 
+  // CALCULATE TIME LIMIT BASED ON THE LEVEL
   const calculateLevelTimeLimit = (level) => {
     return (((level + 1) * (level + 1)) / 2) * 60;
   };
 
+  // CALCULATING TIME LIMIT ON FIRST RENDER
+  useEffect(() => {
+    levelTimeLimit.current = calculateLevelTimeLimit(currentLevel + 1);
+    previousLevel.current = level;
+  }, []);
+
+  // ADDING 15% EXTRA TIME TO THE GAME IF JOKER CARDS WERE MATCHED
   useEffect(() => {
     const calculateJokerTime = Math.floor(
       0.15 * calculateLevelTimeLimit(level + 1)
@@ -27,6 +35,7 @@ export default function Time(props) {
     levelTimeLimit.current += calculateJokerTime;
   }, [jokerTime]);
 
+  // SETTING UP NEW TIME LIMIT INTERVAL
   const settingUpNewInterval = () => {
     clearInterval(timer);
     levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
@@ -35,16 +44,19 @@ export default function Time(props) {
     setCurrentLevel(level);
   };
 
+  // NEW TIME LIMIT INTERVAL IF LEVEL IS CHANGED
   useEffect(() => {
     if (previousLevel.current !== level) {
       settingUpNewInterval();
     }
   }, [level]);
 
+  // NEW TIME LIMIT INTERVAL IF GAME IS RESTARTED
   useEffect(() => {
     settingUpNewInterval();
   }, [restart]);
 
+  // WHEN ALL CARDS WERE MATCHED COUNTER TIME LEFT IS SET TO BE USED IN TOTAL SCORE CALCULATION
   useEffect(() => {
     if (level !== -1) {
       setCounterTimeLeft(levelTimeLimit.current);
@@ -52,11 +64,7 @@ export default function Time(props) {
     }
   }, [getTimeLeft]);
 
-  useEffect(() => {
-    levelTimeLimit.current = calculateLevelTimeLimit(currentLevel + 1);
-    previousLevel.current = level;
-  }, []);
-
+  // NEW TIME LIMIT IS STARTING COUNT DOWN EVERY NEW LEVEL AND WHEN GAME IS RESTARTED
   useEffect(() => {
     timer =
       levelTimeLimit.current >= 0 &&
@@ -69,6 +77,7 @@ export default function Time(props) {
     return () => clearInterval(timer);
   }, [currentLevel, restart]);
 
+  // THIS USE EFFECT CHECKS EVERY SECOND IF TIME HAS EXPIRED, IF YES IT SETS 'timeExpired' TO TRUE
   useEffect(() => {
     if (levelTimeLimit.current === -1) {
       setTimeExpired(true);

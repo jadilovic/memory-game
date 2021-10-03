@@ -19,22 +19,23 @@ const Home = () => {
   const data = useLocalStorageHook();
   const [currentPlayer, setCurrentPlayer] = useState({});
 
+  // INITIAL USE EFFECT TO GET CURRENT PLAYER AND CLEAR GAME STARTED LOCAL STORAGE
   useEffect(() => {
     setCurrentPlayer(data.getCurrentPlayer());
     localStorage.removeItem('gameStarted');
   }, []);
 
+  // STARTING OR RESTARTING NEW GAME AND SETTING LOCAL STORAGE 'NEW_GAME' ITEM
   const startNewGame = (e) => {
     e.preventDefault();
-    // STARTING OR RESTARTING NEW GAME AND SETTING LOCAL STORAGE 'NEW_GAME' ITEM
     data.restartCurrentPlayerLevelAndScoreAndUpdateDatabase(currentPlayer);
     localStorage.setItem('gameStarted', 'NEW_GAME');
     history.push('/game');
   };
 
+  // CONTINUING AT THE LAST STARTED LEVEL BUT NOT FINISHED AND SETTING LOCAL STORAGE 'CONTINUE' ITEM
   const continueGame = (e) => {
     e.preventDefault();
-    // CONTINUING AT THE LAST STARTED LEVEL BUT NOT FINISHED AND SETTING LOCAL STORAGE 'CONTINUE' ITEM
     localStorage.setItem('gameStarted', 'CONTINUE');
     history.push('/game');
   };

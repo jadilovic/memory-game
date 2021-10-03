@@ -130,6 +130,7 @@ export default function Game() {
   useEffect(() => {
     if (mountedRef.current) {
       if (levelCompleted(gridArray)) {
+        // THIS CHANGE CALLS USE EFFECT IN TIME COMPONENT WHICH SETS COUNTER TIME LEFT
         getTimeLeft.current++;
         totalScore.current = totalScore.current + scoreCount;
       }
@@ -141,6 +142,8 @@ export default function Game() {
     let allIsInactive = array.every((item) => item.isInactive === true);
     return allIsInactive;
   };
+
+  // THREE USE EFFECTS
 
   // ONE SECOND TIME OUT AFTER TWO CARDS CLICKED BEFORE THEY ARE CHECKED
   useEffect(() => {
@@ -155,13 +158,16 @@ export default function Game() {
     }
   }, [startTimer]);
 
+  // IF LEVEL IS COMPLETED 'getTimeLeft' IS CHANGED TO GET LEFT TIME FROM TIME COMPONENT
   useEffect(() => {
     console.log('COUNTER TIMER LEFT');
     if (mountedRef.current) {
+      // NEW PLAYER SCORE AND LEVEL IS SAVED AND MODAL IS CALLED
       saveToLocalStorageAndShowMatchesFoundModal();
     }
   }, [counterTimeLeft]);
 
+  // IF LEVEL TIME HAS EXPIRED THIS USE EFFECT OPENS TIME EXPIRED MODAL
   useEffect(() => {
     console.log('TIME EXPIRED');
     if (mountedRef.current) {
@@ -171,19 +177,22 @@ export default function Game() {
     }
   }, [timeExpired]);
 
+  // CHECKING WHAT SIDE OF THE CARD TO SHOW ON THE GRID
   const isNotPreviousOrInactive = (index) => {
     return !gridArray[index].isInactive
       ? previousIndex.current !== index
       : false;
   };
 
+  // AFTER EVERY CLICK UPDATE CLICKED CARD IN THE CARD ARRAY
   const updateCardAndGridArray = (index) => {
     gridArray[index].isFlipped = true;
     setGridArray(gridArray);
-    // clicks d to rerender
+    // SET CLICKS TO RERENDER
     setClicks(clicks + 1);
   };
 
+  // CHECKING IF TWO CARDS WERE ADDED TO THE ARRAY
   const checkTwoCardsArraySize = () => {
     if (twoCardsArray.current.length > 1) {
       clearTimeout(timer);
@@ -191,6 +200,7 @@ export default function Game() {
     }
   };
 
+  // ADDING CLICKED CARDS TO THE TWO CARDS ARRAY
   const addCardValuesToTwoCardsArray = (index) => {
     const clickedCard = { cardIndex: index, id: gridArray[index].id };
     twoCardsArray.current.push(clickedCard);
@@ -200,10 +210,12 @@ export default function Game() {
   const startTimerIfTwoCardsAdded = () => {
     console.log('SET START TIMER IF TWO CARDS ADDED');
     if (twoCardsArray.current.length > 1) {
+      // IF TWO CARDS ADDED SET START TIMER TO CALL ONE SECOND SET TIME OUT USE EFFECT
       setStartTimer(startTimer + 1);
     }
   };
 
+  // EVERY CARD CLICK IS HANDLED HERE
   const handleClicks = (index) => {
     if (isNotPreviousOrInactive(index)) {
       previousIndex.current = index;
@@ -214,6 +226,7 @@ export default function Game() {
     }
   };
 
+  // RESTARTING THE GAME AT THE SAME LEVEL
   const restartCurrentLevel = () => {
     setRestartTimeLimit(restartTimeLimit + 1);
     numberOfCards.current = level.current * 2 * (level.current * 2);
