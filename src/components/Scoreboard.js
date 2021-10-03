@@ -34,7 +34,11 @@ export default function Scoreboard() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    setPlayers(data.getAllPlayers);
+    const sortedPlayers = data.getAllPlayers();
+    sortedPlayers.sort(function (a, b) {
+      return b.score - a.score;
+    });
+    setPlayers(sortedPlayers);
   }, []);
 
   return (

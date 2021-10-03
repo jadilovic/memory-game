@@ -31,8 +31,6 @@ export default function Time(props) {
     clearInterval(timer);
     levelTimeLimit.current = calculateLevelTimeLimit(level + 1);
     previousLevel.current = level;
-    console.log('current level: ', currentLevel);
-    console.log('level: ', level);
     setTimeCounter(levelTimeLimit.current);
     setCurrentLevel(level);
   };
@@ -48,9 +46,7 @@ export default function Time(props) {
   }, [restart]);
 
   useEffect(() => {
-    console.log('2.0 get time use effect ', level);
     if (level !== -1) {
-      console.log('2.1 current level time limit', levelTimeLimit.current);
       setCounterTimeLeft(levelTimeLimit.current);
       levelTimeLimit.current = -2;
     }
@@ -62,10 +58,6 @@ export default function Time(props) {
   }, []);
 
   useEffect(() => {
-    console.log(
-      'current level use effect levelTimeLimit.current',
-      levelTimeLimit.current
-    );
     timer =
       levelTimeLimit.current >= 0 &&
       setInterval(() => {

@@ -22,12 +22,11 @@ const Home = () => {
   useEffect(() => {
     setCurrentPlayer(data.getCurrentPlayer());
     localStorage.removeItem('gameStarted');
-    localStorage.removeItem('shuffledImages');
   }, []);
 
   const startNewGame = (e) => {
     e.preventDefault();
-    // NEW ITEM IN LOCAL STORAGE TO CONTROL START OF THE GAME
+    // STARTING OR RESTARTING NEW GAME AND SETTING LOCAL STORAGE 'NEW_GAME' ITEM
     data.restartCurrentPlayerLevelAndScoreAndUpdateDatabase(currentPlayer);
     localStorage.setItem('gameStarted', 'NEW_GAME');
     history.push('/game');
@@ -35,7 +34,7 @@ const Home = () => {
 
   const continueGame = (e) => {
     e.preventDefault();
-    // NEW ITEM IN LOCAL STORAGE TO CONTROL START OF THE GAME
+    // CONTINUING AT THE LAST STARTED LEVEL BUT NOT FINISHED AND SETTING LOCAL STORAGE 'CONTINUE' ITEM
     localStorage.setItem('gameStarted', 'CONTINUE');
     history.push('/game');
   };

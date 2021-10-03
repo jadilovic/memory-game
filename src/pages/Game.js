@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, memo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import useLocalStorageHook from '../utils/useLocalStorageHook';
 import useArrayHook from '../utils/useArrayHook';
 import useMountedRef from '../utils/useMountedRef';
@@ -43,7 +43,10 @@ export default function Game() {
   const gameStarted = localStorage.getItem('gameStarted');
   let timer = null;
 
+  console.log('START TIMER VALUE INITIAL: ', startTimer);
+
   function shuffleImages(array) {
+    console.log('selected card: ', array[0].type);
     const length = array.length;
     for (let i = length; i > 0; i--) {
       const randomIndex = Math.floor(Math.random() * i);
@@ -74,9 +77,11 @@ export default function Game() {
     data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
       calculatedScore
     );
+    // MODAL IS CALLED IN THE END
     setOpenMatchesFoundModal(true);
   };
 
+  // PLAYERS IS TAKEN TO THE NEXT LEVEL
   const startNextLevel = () => {
     setScoreCount(data.getCurrentPlayer().score);
     level.current++;
@@ -84,23 +89,26 @@ export default function Game() {
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
   };
 
-  const emptyTwoCardsArrayAndRerender = () => {
-    twoCardsArray.current.pop();
-    twoCardsArray.current.pop();
-    setClicks(clicks + 1);
-  };
-
-  const addPoints = () => {
-    setScoreCount(scoreCount + 2);
-  };
-
+  // IF TWO CARDS MATCH CHECK IF THEY ARE JOKER CARDS
   const checkIfJokerCard = (imageIndexAtTwoCards) => {
     if (imageIndexAtTwoCards === 0) {
       setJokerTime(jokerTime + 1);
     }
   };
 
-  // CHECKING TWO CLICKED CARDS
+  // ADD TWO POINTS TO THE SCORE IF SET OF CARDS ARE MATCHED
+  const addPoints = () => {
+    setScoreCount(scoreCount + 2);
+  };
+
+  // AFTER CHECKING THE CARDS ARRAY IS EMPTIED
+  const emptyTwoCardsArrayAndRerender = () => {
+    twoCardsArray.current.pop();
+    twoCardsArray.current.pop();
+    setClicks(clicks + 1);
+  };
+
+  // CHECKING TWO CLICKED CARDS MATCH
   const checkClickedCards = () => {
     if (twoCardsArray.current[0].id === twoCardsArray.current[1].id) {
       gridArray[twoCardsArray.current[0].cardIndex].isInactive = true;
@@ -118,27 +126,25 @@ export default function Game() {
   };
 
   // EVERY TIME POINTS ARE ADDED THIS USE EFFECT IS CALLED TO CHECK IF LEVEL IS COMPLETED
-  // AND IF TRUE SCORE IS SAVED TO LOCAL STORAGE AND USER IS TRANSFERED TO THE NEXT LEVEL
+  // AND IF TRUE REMAININGT TIME IS EXTRACTED AND TOTAL SCORE CALCULATED
   useEffect(() => {
     if (mountedRef.current) {
       if (levelCompleted(gridArray)) {
-        console.log(
-          '1 if completed, score count use effect, and increase level'
-        );
-        console.log('counter time left', counterTimeLeft);
         getTimeLeft.current++;
         totalScore.current = totalScore.current + scoreCount;
       }
     }
   }, [scoreCount]);
 
-  // CHECK IF LEVEL IS COMPLETED AFTER TWO EQUAL CARDS ARE FOUND AND SCORE IS INCREASED
+  // CHECK IF LEVEL IS COMPLETED AFTER SCORE IS INCREASED
   const levelCompleted = (array) => {
     let allIsInactive = array.every((item) => item.isInactive === true);
     return allIsInactive;
   };
 
+  // ONE SECOND TIME OUT AFTER TWO CARDS CLICKED BEFORE THEY ARE CHECKED
   useEffect(() => {
+    console.log('START TIMER VALUE IN USE EFFECT: ', startTimer);
     if (mountedRef.current) {
       timer = setTimeout(() => {
         checkClickedCards();
@@ -150,13 +156,14 @@ export default function Game() {
   }, [startTimer]);
 
   useEffect(() => {
+    console.log('COUNTER TIMER LEFT');
     if (mountedRef.current) {
-      console.log('3 use effect counter time left');
       saveToLocalStorageAndShowMatchesFoundModal();
     }
   }, [counterTimeLeft]);
 
   useEffect(() => {
+    console.log('TIME EXPIRED');
     if (mountedRef.current) {
       if (timeExpired) {
         setOpenTimeExpiredModal(true);
@@ -189,7 +196,9 @@ export default function Game() {
     twoCardsArray.current.push(clickedCard);
   };
 
+  // AFTER EVERY CLICK CHECKING IF TWO CARDS ARE ADDED TO THE TWO CARDS ARRAY
   const startTimerIfTwoCardsAdded = () => {
+    console.log('SET START TIMER IF TWO CARDS ADDED');
     if (twoCardsArray.current.length > 1) {
       setStartTimer(startTimer + 1);
     }
@@ -213,8 +222,8 @@ export default function Game() {
     setTimeExpired(false);
   };
 
-  // modal ubaciti
-  console.log(gridArray);
+  // ARRAY OF DISPLAYED CARDS
+  console.log('array of displayed cards: ', gridArray);
   return (
     <Container maxWidth="md">
       <Heading
