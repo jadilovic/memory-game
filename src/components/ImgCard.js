@@ -32,7 +32,7 @@ const ImgCard = ({ card, index, onClick }) => {
           component="img"
           image={imageStatus()}
           alt={type}
-          loading="lazy"
+          loading="eager"
         />
       </CardActionArea>
     </Card>

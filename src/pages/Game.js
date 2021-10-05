@@ -184,6 +184,7 @@ export default function Game() {
 
   // CHECKING WHAT SIDE OF THE CARD TO SHOW ON THE GRID
   const isNotPreviousOrInactive = (index) => {
+    // IF THE CARD IS NOT FLIPPED IT CAN BE CLICKED AGAIN AN FLIP
     if (!gridArray[index].isFlipped) {
       return true;
     }
@@ -230,8 +231,6 @@ export default function Game() {
 
   // EVERY CARD CLICK IS HANDLED HERE
   const handleClicks = (index) => {
-    console.log('index     : ', index);
-    console.log('previousIndex   : ', previousIndex.current);
     if (isNotPreviousOrInactive(index)) {
       previousIndex.current = index;
       checkTwoCardsArraySize(index);
