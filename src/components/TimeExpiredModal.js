@@ -36,7 +36,7 @@ export default function TimeExpiredModal(props) {
       <DialogContent>
         <DialogContentText>
           You can try again at the same level by clicking 'RESTART SAME LEVEL'
-          or go back to the Home page by clicking on the 'BACKT TO HOME PAGE'
+          or go back to the Home page by clicking on the 'BACK TO HOME PAGE'
           button.
         </DialogContentText>
       </DialogContent>

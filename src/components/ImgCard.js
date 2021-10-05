@@ -23,7 +23,10 @@ const ImgCard = ({ card, index, onClick }) => {
   };
 
   return (
-    <Card style={{ background: backgroundColor }} sx={{ display: 'flex' }}>
+    <Card
+      style={{ background: isInactive ? '' : backgroundColor }}
+      sx={{ display: 'flex' }}
+    >
       <CardActionArea onClick={handleClick}>
         <CardMedia
           component="img"

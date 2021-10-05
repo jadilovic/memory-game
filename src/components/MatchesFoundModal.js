@@ -36,7 +36,7 @@ export default function MatchesFoundModal(props) {
       <DialogContent>
         <DialogContentText>
           You can go to the next level by clicking 'NEXT LEVEL' or go back to
-          the Home page by clicking on the 'BACKT TO HOME PAGE' button.
+          the Home page by clicking on the 'BACK TO HOME PAGE' button.
         </DialogContentText>
       </DialogContent>
       <DialogActions>

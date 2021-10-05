@@ -81,7 +81,7 @@ const Home = () => {
                 <Typography>continue</Typography>
               </Button>
               <Typography component="text">
-                Starts the game at not completed level
+                Starts game one level above your highest completed level
               </Typography>
             </Item>
           </Grid>
