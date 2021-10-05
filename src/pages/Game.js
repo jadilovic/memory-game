@@ -72,7 +72,6 @@ export default function Game() {
 
   // AFTER LEVEL IS COMPLETED FINAL SCORE IS CALCULATED AND ALL IS SAVED TO LOCAL STORAGE
   const saveToLocalStorageAndShowMatchesFoundModal = () => {
-    console.log('4 save method ', counterTimeLeft);
     const calculatedScore = totalScore.current + counterTimeLeft;
     data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
       calculatedScore
@@ -123,6 +122,8 @@ export default function Game() {
     }
     setGridArray(gridArray);
     emptyTwoCardsArrayAndRerender();
+    // IF INDEX EXISTS THIS FUNCTION IS CALLED FROM 'checkTwoCardsArraySize' FUNCTION
+    // IF INDEX DOES NOT EXIST THIS FUNCTION IS CALLED FROM USE EFFECT 'startTimer'
     if (index) {
       updateCardAndGridArray(index);
       addCardValuesToTwoCardsArray(index);
@@ -151,7 +152,7 @@ export default function Game() {
 
   // ONE SECOND TIME OUT AFTER TWO CARDS CLICKED BEFORE THEY ARE CHECKED
   useEffect(() => {
-    console.log('START TIMER VALUE IN USE EFFECT: ', startTimer);
+    console.log('USE EFFECT START TIMER');
     if (mountedRef.current) {
       timer = setTimeout(() => {
         checkClickedCards();
@@ -164,7 +165,7 @@ export default function Game() {
 
   // IF LEVEL IS COMPLETED 'getTimeLeft' IS CHANGED TO GET LEFT TIME FROM TIME COMPONENT
   useEffect(() => {
-    console.log('COUNTER TIMER LEFT');
+    console.log('USE EFFECT COUNTER TIMER LEFT');
     if (mountedRef.current) {
       // NEW PLAYER SCORE AND LEVEL IS SAVED AND MODAL IS CALLED
       saveToLocalStorageAndShowMatchesFoundModal();
@@ -173,7 +174,7 @@ export default function Game() {
 
   // IF LEVEL TIME HAS EXPIRED THIS USE EFFECT OPENS TIME EXPIRED MODAL
   useEffect(() => {
-    console.log('TIME EXPIRED');
+    console.log('USE EFFECT TIME EXPIRED');
     if (mountedRef.current) {
       if (timeExpired) {
         setOpenTimeExpiredModal(true);
@@ -183,6 +184,9 @@ export default function Game() {
 
   // CHECKING WHAT SIDE OF THE CARD TO SHOW ON THE GRID
   const isNotPreviousOrInactive = (index) => {
+    if (!gridArray[index].isFlipped) {
+      return true;
+    }
     return !gridArray[index].isInactive
       ? previousIndex.current !== index
       : false;
@@ -199,9 +203,11 @@ export default function Game() {
   // CHECKING IF TWO CARDS WERE ADDED TO THE ARRAY
   const checkTwoCardsArraySize = (index) => {
     if (twoCardsArray.current.length > 1) {
+      // IF TWO CARDS ARE ALREADY IN THE ARRAY TIME OUT IS CLEARED AND CARDS ARE CHECKED BEFORE ONE SECOND EXPIRES
       clearTimeout(timer);
       checkClickedCards(index);
     } else {
+      // IF NO OR ONLY ONE CARD IN THE ARRAY NEW CLICKED CARD IS ADDED
       updateCardAndGridArray(index);
       addCardValuesToTwoCardsArray(index);
       startTimerIfTwoCardsAdded();
@@ -216,7 +222,6 @@ export default function Game() {
 
   // AFTER EVERY CLICK CHECKING IF TWO CARDS ARE ADDED TO THE TWO CARDS ARRAY
   const startTimerIfTwoCardsAdded = () => {
-    console.log('SET START TIMER IF TWO CARDS ADDED');
     if (twoCardsArray.current.length > 1) {
       // IF TWO CARDS ADDED SET START TIMER TO CALL ONE SECOND SET TIME OUT USE EFFECT
       setStartTimer(startTimer + 1);
@@ -225,6 +230,8 @@ export default function Game() {
 
   // EVERY CARD CLICK IS HANDLED HERE
   const handleClicks = (index) => {
+    console.log('index     : ', index);
+    console.log('previousIndex   : ', previousIndex.current);
     if (isNotPreviousOrInactive(index)) {
       previousIndex.current = index;
       checkTwoCardsArraySize(index);
