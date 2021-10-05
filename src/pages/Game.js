@@ -109,7 +109,7 @@ export default function Game() {
   };
 
   // CHECKING TWO CLICKED CARDS MATCH
-  const checkClickedCards = () => {
+  const checkClickedCards = (index) => {
     if (twoCardsArray.current[0].id === twoCardsArray.current[1].id) {
       gridArray[twoCardsArray.current[0].cardIndex].isInactive = true;
       gridArray[twoCardsArray.current[1].cardIndex].isInactive = true;
@@ -123,6 +123,10 @@ export default function Game() {
     }
     setGridArray(gridArray);
     emptyTwoCardsArrayAndRerender();
+    if (index) {
+      updateCardAndGridArray(index);
+      addCardValuesToTwoCardsArray(index);
+    }
   };
 
   // EVERY TIME POINTS ARE ADDED THIS USE EFFECT IS CALLED TO CHECK IF LEVEL IS COMPLETED
@@ -193,10 +197,14 @@ export default function Game() {
   };
 
   // CHECKING IF TWO CARDS WERE ADDED TO THE ARRAY
-  const checkTwoCardsArraySize = () => {
+  const checkTwoCardsArraySize = (index) => {
     if (twoCardsArray.current.length > 1) {
       clearTimeout(timer);
-      checkClickedCards();
+      checkClickedCards(index);
+    } else {
+      updateCardAndGridArray(index);
+      addCardValuesToTwoCardsArray(index);
+      startTimerIfTwoCardsAdded();
     }
   };
 
@@ -219,10 +227,7 @@ export default function Game() {
   const handleClicks = (index) => {
     if (isNotPreviousOrInactive(index)) {
       previousIndex.current = index;
-      checkTwoCardsArraySize();
-      updateCardAndGridArray(index);
-      addCardValuesToTwoCardsArray(index);
-      startTimerIfTwoCardsAdded();
+      checkTwoCardsArraySize(index);
     }
   };
 
