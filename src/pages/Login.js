@@ -123,6 +123,14 @@ const Login = () => {
                   </CardActions>
                 </form>
               </Card>
+              <CardContent>
+                <Typography variant="body1" color="text.secondary">
+                  You score points by matching two same cards and if you matched
+                  all cards within the time limit, you score additional points
+                  which are equal the number of seconds that are left on the
+                  timer.
+                </Typography>
+              </CardContent>
             </Item>
           </Grid>
         </Grid>

@@ -16,11 +16,6 @@ export default function MatchesFoundModal(props) {
   const { openMatchesFoundModal, setOpenMatchesFoundModal, startNextLevel } =
     props;
 
-  const handleClose = () => {
-    startNextLevel();
-    setOpenMatchesFoundModal(false);
-  };
-
   const handleStartNextLevel = () => {
     startNextLevel();
     setOpenMatchesFoundModal(false);
@@ -30,7 +25,7 @@ export default function MatchesFoundModal(props) {
     <Dialog
       fullScreen={fullScreen}
       open={openMatchesFoundModal}
-      onClose={handleClose}
+      disableEscapeKeyDown
     >
       <DialogTitle>You Won! All cards were matched!</DialogTitle>
       <DialogContent>

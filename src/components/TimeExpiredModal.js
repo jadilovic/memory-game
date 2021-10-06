@@ -16,11 +16,6 @@ export default function TimeExpiredModal(props) {
   const { openTimeExpiredModal, setOpenTimeExpiredModal, restartCurrentLevel } =
     props;
 
-  const handleClose = () => {
-    restartCurrentLevel();
-    setOpenTimeExpiredModal(false);
-  };
-
   const handleRestart = () => {
     restartCurrentLevel();
     setOpenTimeExpiredModal(false);
@@ -30,7 +25,7 @@ export default function TimeExpiredModal(props) {
     <Dialog
       fullScreen={fullScreen}
       open={openTimeExpiredModal}
-      onClose={handleClose}
+      disableEscapeKeyDown
     >
       <DialogTitle>Level Time Has Expired</DialogTitle>
       <DialogContent>

@@ -4,10 +4,10 @@ import Typography from '@mui/material/Typography';
 export default function Time(props) {
   const {
     level,
-    restart,
+    restartLevel,
     setCounterTimeLeft,
-    jokerTime,
-    getTimeLeft,
+    foundJoker,
+    totalScore,
     setTimeExpired,
   } = props;
   const [timeCounter, setTimeCounter] = useState(0);
@@ -33,7 +33,7 @@ export default function Time(props) {
       0.15 * calculateLevelTimeLimit(level + 1)
     );
     levelTimeLimit.current += calculateJokerTime;
-  }, [jokerTime]);
+  }, [foundJoker]);
 
   // SETTING UP NEW TIME LIMIT INTERVAL
   const settingUpNewInterval = () => {
@@ -54,7 +54,7 @@ export default function Time(props) {
   // NEW TIME LIMIT INTERVAL IF GAME IS RESTARTED
   useEffect(() => {
     settingUpNewInterval();
-  }, [restart]);
+  }, [restartLevel]);
 
   // WHEN ALL CARDS WERE MATCHED COUNTER TIME LEFT IS SET TO BE USED IN TOTAL SCORE CALCULATION
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function Time(props) {
       setCounterTimeLeft(levelTimeLimit.current);
       levelTimeLimit.current = -2;
     }
-  }, [getTimeLeft]);
+  }, [totalScore]);
 
   // NEW TIME LIMIT IS STARTING COUNT DOWN EVERY NEW LEVEL AND WHEN GAME IS RESTARTED
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function Time(props) {
         }
       }, 1000);
     return () => clearInterval(timer);
-  }, [currentLevel, restart]);
+  }, [currentLevel, restartLevel]);
 
   // THIS USE EFFECT CHECKS EVERY SECOND IF TIME HAS EXPIRED, IF YES IT SETS 'timeExpired' TO TRUE
   useEffect(() => {

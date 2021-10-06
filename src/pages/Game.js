@@ -23,12 +23,15 @@ export default function Game() {
   const util = useArrayHook();
   const mountedRef = useMountedRef();
   const [scoreCount, setScoreCount] = useState(0);
+  const [counterTimeLeft, setCounterTimeLeft] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [gridArray, setGridArray] = useState([]);
-  const [startTimer, setStartTimer] = useState(0);
-  const [restartTimeLimit, setRestartTimeLimit] = useState(0);
-  const [counterTimeLeft, setCounterTimeLeft] = useState(0);
-  const [jokerTime, setJokerTime] = useState(0);
+  // NEW startTimer
+  const [startTimer, setStartTimer] = useState(false);
+  // NEW restartLevel
+  const [restartLevel, setRestartLevel] = useState(false);
+  // NEW foundJoker
+  const [foundJoker, setFoundJoker] = useState(false);
   const [timeExpired, setTimeExpired] = useState(false);
   const [openTimeExpiredModal, setOpenTimeExpiredModal] = useState(false);
   const [openMatchesFoundModal, setOpenMatchesFoundModal] = useState(false);
@@ -39,7 +42,7 @@ export default function Game() {
   const previousIndex = useRef(-1);
   const twoCardsArray = useRef([]);
   const totalScore = useRef(0);
-  const getTimeLeft = useRef(0);
+  // const getTimeLeft = useRef(0);
   const gameStarted = localStorage.getItem('gameStarted');
   let timer = null;
 
@@ -91,7 +94,7 @@ export default function Game() {
   // IF TWO CARDS MATCH CHECK IF THEY ARE JOKER CARDS
   const checkIfJokerCard = (imageIndexAtTwoCards) => {
     if (imageIndexAtTwoCards === 0) {
-      setJokerTime(jokerTime + 1);
+      setFoundJoker(true);
     }
   };
 
@@ -124,7 +127,8 @@ export default function Game() {
     emptyTwoCardsArrayAndRerender();
     // IF INDEX EXISTS THIS FUNCTION IS CALLED FROM 'checkTwoCardsArraySize' FUNCTION
     // IF INDEX DOES NOT EXIST THIS FUNCTION IS CALLED FROM USE EFFECT 'startTimer'
-    if (index) {
+    // IF INDEX 0 AVOIDED FALSLY RESULT
+    if (index || index === 0) {
       updateCardAndGridArray(index);
       addCardValuesToTwoCardsArray(index);
     }
@@ -136,7 +140,9 @@ export default function Game() {
     if (mountedRef.current) {
       if (levelCompleted(gridArray)) {
         // THIS CHANGE CALLS USE EFFECT IN TIME COMPONENT WHICH SETS COUNTER TIME LEFT
-        getTimeLeft.current++;
+
+        // PROMJENITI NAZIV REF VARIABLE
+        // getTimeLeft.current++;
         totalScore.current = totalScore.current + scoreCount;
       }
     }
@@ -152,7 +158,7 @@ export default function Game() {
 
   // ONE SECOND TIME OUT AFTER TWO CARDS CLICKED BEFORE THEY ARE CHECKED
   useEffect(() => {
-    console.log('USE EFFECT START TIMER');
+    console.log('USE EFFECT START TIMER', startTimer);
     if (mountedRef.current) {
       timer = setTimeout(() => {
         checkClickedCards();
@@ -225,7 +231,11 @@ export default function Game() {
   const startTimerIfTwoCardsAdded = () => {
     if (twoCardsArray.current.length > 1) {
       // IF TWO CARDS ADDED SET START TIMER TO CALL ONE SECOND SET TIME OUT USE EFFECT
-      setStartTimer(startTimer + 1);
+      if (startTimer) {
+        setStartTimer(false);
+      } else {
+        setStartTimer(true);
+      }
     }
   };
 
@@ -239,11 +249,16 @@ export default function Game() {
 
   // RESTARTING THE GAME AT THE SAME LEVEL
   const restartCurrentLevel = () => {
-    setRestartTimeLimit(restartTimeLimit + 1);
+    if (restartLevel) {
+      setRestartLevel(false);
+    } else {
+      setRestartLevel(true);
+    }
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
     setScoreCount(data.getCurrentPlayer().score);
     setTimeExpired(false);
+    setFoundJoker(false);
   };
 
   // ARRAY OF DISPLAYED CARDS
@@ -305,10 +320,10 @@ export default function Game() {
             <Item>
               <Time
                 level={level.current - 1}
-                restart={restartTimeLimit}
+                restartLevel={restartLevel}
                 setCounterTimeLeft={setCounterTimeLeft}
-                jokerTime={jokerTime}
-                getTimeLeft={getTimeLeft.current}
+                foundJoker={foundJoker}
+                totalScore={totalScore.current}
                 setTimeExpired={setTimeExpired}
               />
             </Item>
