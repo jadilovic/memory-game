@@ -6,6 +6,7 @@ import { Button, Typography, Container, Box, Grid, Paper } from '@mui/material';
 import Heading from '../components/Heading';
 import LevelAndScore from '../components/LevelAndScore';
 import Scoreboard from '../components/Scoreboard';
+import LevelSelect from '../components/LevelSelect';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -18,11 +19,14 @@ const Home = () => {
   const history = useHistory();
   const data = useLocalStorageHook();
   const [currentPlayer, setCurrentPlayer] = useState({});
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [error, setError] = useState(false);
 
   // INITIAL USE EFFECT TO GET CURRENT PLAYER AND CLEAR GAME STARTED LOCAL STORAGE
   useEffect(() => {
     setCurrentPlayer(data.getCurrentPlayer());
     localStorage.removeItem('gameStarted');
+    localStorage.removeItem('selectedLevel');
   }, []);
 
   // STARTING OR RESTARTING NEW GAME AND SETTING LOCAL STORAGE 'NEW_GAME' ITEM
@@ -38,6 +42,19 @@ const Home = () => {
     e.preventDefault();
     localStorage.setItem('gameStarted', 'CONTINUE');
     history.push('/game');
+  };
+
+  // CONTINUING AT THE LAST STARTED LEVEL BUT NOT FIN AND SETTING LOCAL STORAGE 'CONTINUE' ITEM
+  const startGameFromSelectedLevel = (e) => {
+    e.preventDefault();
+    if (selectedLevel) {
+      localStorage.setItem('gameStarted', 'START_FROM_SELECTED_LEVEL');
+      localStorage.setItem('selectedLevel', selectedLevel);
+      setError(false);
+      history.push('/game');
+    } else {
+      setError(true);
+    }
   };
 
   return (
@@ -84,6 +101,37 @@ const Home = () => {
                 Starts game one level above your highest completed level
               </Typography>
             </Item>
+          </Grid>
+          <Grid item xs={12}>
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Item>
+                    <LevelSelect
+                      setSelectedLevel={setSelectedLevel}
+                      selectedLevel={selectedLevel}
+                      error={error}
+                    />
+                  </Item>
+                </Grid>
+                <Grid item xs={6}>
+                  <Item>
+                    <Button
+                      style={{
+                        minHeight: '56px',
+                      }}
+                      onClick={startGameFromSelectedLevel}
+                      color="info"
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                    >
+                      <Typography>GO TO SELECTED LEVEL</Typography>
+                    </Button>
+                  </Item>
+                </Grid>
+              </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Box>

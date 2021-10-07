@@ -26,11 +26,8 @@ export default function Game() {
   const [counterTimeLeft, setCounterTimeLeft] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [gridArray, setGridArray] = useState([]);
-  // NEW startTimer
-  const [startTimer, setStartTimer] = useState(false);
-  // NEW restartLevel
-  const [restartLevel, setRestartLevel] = useState(false);
-  // NEW foundJoker
+  const [cardsTimeoutStarted, setCardsTimeoutStarted] = useState(false);
+  const [shouldRestartLevel, setShouldRestartLevel] = useState(false);
   const [foundJoker, setFoundJoker] = useState(false);
   const [timeExpired, setTimeExpired] = useState(false);
   const [openTimeExpiredModal, setOpenTimeExpiredModal] = useState(false);
@@ -42,11 +39,11 @@ export default function Game() {
   const previousIndex = useRef(-1);
   const twoCardsArray = useRef([]);
   const totalScore = useRef(0);
-  // const getTimeLeft = useRef(0);
   const gameStarted = localStorage.getItem('gameStarted');
+  const selectedLevel = localStorage.getItem('selectedLevel');
   let timer = null;
 
-  console.log('START TIMER VALUE INITIAL: ', startTimer);
+  console.log('START TIMER VALUE INITIAL: ', cardsTimeoutStarted);
 
   function shuffleImages(array) {
     console.log('selected card: ', array[0].type);
@@ -64,20 +61,30 @@ export default function Game() {
   // INITIAL USE EFFECT TO CREATE GRID OF CARDS SET SCORE AND TIME AT THE START OF THE GAME
   useEffect(() => {
     player.current = data.getCurrentPlayer();
-    level.current = player.current.level + 1;
+    settingPlayerScoreAndLevel(selectedLevel);
+    numberOfCards.current = level.current * 2 * (level.current * 2);
+    setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
+  }, []);
+
+  const settingPlayerScoreAndLevel = (playerSelectedLevel) => {
+    if (playerSelectedLevel) {
+      level.current = new Number(selectedLevel);
+      setScoreCount(data.getCurrentPlayer().score);
+    } else {
+      level.current = player.current.level + 1;
+    }
     if (gameStarted === 'CONTINUE') {
       level.current + 1;
       setScoreCount(data.getCurrentPlayer().score);
     }
-    numberOfCards.current = level.current * 2 * (level.current * 2);
-    setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
-  }, []);
+  };
 
   // AFTER LEVEL IS COMPLETED FINAL SCORE IS CALCULATED AND ALL IS SAVED TO LOCAL STORAGE
   const saveToLocalStorageAndShowMatchesFoundModal = () => {
     const calculatedScore = totalScore.current + counterTimeLeft;
     data.increaseCurrentPlayerLevelAndAddScoreAndUpdateDatabase(
-      calculatedScore
+      calculatedScore,
+      level.current
     );
     // MODAL IS CALLED IN THE END
     setOpenMatchesFoundModal(true);
@@ -126,7 +133,7 @@ export default function Game() {
     setGridArray(gridArray);
     emptyTwoCardsArrayAndRerender();
     // IF INDEX EXISTS THIS FUNCTION IS CALLED FROM 'checkTwoCardsArraySize' FUNCTION
-    // IF INDEX DOES NOT EXIST THIS FUNCTION IS CALLED FROM USE EFFECT 'startTimer'
+    // IF INDEX DOES NOT EXIST THIS FUNCTION IS CALLED FROM USE EFFECT 'cardsTimeoutStarted'
     // IF INDEX 0 AVOIDED FALSLY RESULT
     if (index || index === 0) {
       updateCardAndGridArray(index);
@@ -140,9 +147,6 @@ export default function Game() {
     if (mountedRef.current) {
       if (levelCompleted(gridArray)) {
         // THIS CHANGE CALLS USE EFFECT IN TIME COMPONENT WHICH SETS COUNTER TIME LEFT
-
-        // PROMJENITI NAZIV REF VARIABLE
-        // getTimeLeft.current++;
         totalScore.current = totalScore.current + scoreCount;
       }
     }
@@ -158,7 +162,7 @@ export default function Game() {
 
   // ONE SECOND TIME OUT AFTER TWO CARDS CLICKED BEFORE THEY ARE CHECKED
   useEffect(() => {
-    console.log('USE EFFECT START TIMER', startTimer);
+    console.log('USE EFFECT START TIMER', cardsTimeoutStarted);
     if (mountedRef.current) {
       timer = setTimeout(() => {
         checkClickedCards();
@@ -167,7 +171,7 @@ export default function Game() {
         clearTimeout(timer);
       };
     }
-  }, [startTimer]);
+  }, [cardsTimeoutStarted]);
 
   // IF LEVEL IS COMPLETED 'getTimeLeft' IS CHANGED TO GET LEFT TIME FROM TIME COMPONENT
   useEffect(() => {
@@ -217,7 +221,7 @@ export default function Game() {
       // IF NO OR ONLY ONE CARD IN THE ARRAY NEW CLICKED CARD IS ADDED
       updateCardAndGridArray(index);
       addCardValuesToTwoCardsArray(index);
-      startTimerIfTwoCardsAdded();
+      startCardsTimeoutIfTwoCardsAdded();
     }
   };
 
@@ -228,13 +232,13 @@ export default function Game() {
   };
 
   // AFTER EVERY CLICK CHECKING IF TWO CARDS ARE ADDED TO THE TWO CARDS ARRAY
-  const startTimerIfTwoCardsAdded = () => {
+  const startCardsTimeoutIfTwoCardsAdded = () => {
     if (twoCardsArray.current.length > 1) {
       // IF TWO CARDS ADDED SET START TIMER TO CALL ONE SECOND SET TIME OUT USE EFFECT
-      if (startTimer) {
-        setStartTimer(false);
+      if (cardsTimeoutStarted) {
+        setCardsTimeoutStarted(false);
       } else {
-        setStartTimer(true);
+        setCardsTimeoutStarted(true);
       }
     }
   };
@@ -249,10 +253,10 @@ export default function Game() {
 
   // RESTARTING THE GAME AT THE SAME LEVEL
   const restartCurrentLevel = () => {
-    if (restartLevel) {
-      setRestartLevel(false);
+    if (shouldRestartLevel) {
+      setShouldRestartLevel(false);
     } else {
-      setRestartLevel(true);
+      setShouldRestartLevel(true);
     }
     numberOfCards.current = level.current * 2 * (level.current * 2);
     setGridArray(shuffleImages(util.createArray(numberOfCards.current)));
@@ -320,7 +324,7 @@ export default function Game() {
             <Item>
               <Time
                 level={level.current - 1}
-                restartLevel={restartLevel}
+                shouldRestartLevel={shouldRestartLevel}
                 setCounterTimeLeft={setCounterTimeLeft}
                 foundJoker={foundJoker}
                 totalScore={totalScore.current}
