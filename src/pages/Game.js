@@ -69,6 +69,7 @@ export default function Game() {
   const settingPlayerScoreAndLevel = (playerSelectedLevel) => {
     if (playerSelectedLevel) {
       level.current = new Number(selectedLevel);
+      // THINK ABOUT IT
       setScoreCount(data.getCurrentPlayer().score);
     } else {
       level.current = player.current.level + 1;

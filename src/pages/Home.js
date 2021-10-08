@@ -46,6 +46,7 @@ const Home = () => {
 
   // CONTINUING AT THE LAST STARTED LEVEL BUT NOT FIN AND SETTING LOCAL STORAGE 'CONTINUE' ITEM
   const startGameFromSelectedLevel = (e) => {
+    console.log('start game from selected level', selectedLevel);
     e.preventDefault();
     if (selectedLevel) {
       localStorage.setItem('gameStarted', 'START_FROM_SELECTED_LEVEL');
@@ -108,6 +109,7 @@ const Home = () => {
                 <Grid item xs={6}>
                   <Item>
                     <LevelSelect
+                      level={currentPlayer.level}
                       setSelectedLevel={setSelectedLevel}
                       selectedLevel={selectedLevel}
                       error={error}
